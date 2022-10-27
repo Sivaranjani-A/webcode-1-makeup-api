@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eyeliner collections</title>
+  <!--Bootstrap cdn link-->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+    integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+  <!--internal css-->
+  <style>
+    .row {
+      padding: 25px 20px 0px 20px;
+      background-color: rgb(48, 78, 89);
+      margin-top: 50px;
+    }
+
+    .col md-4 {
+      margin: 20px;
+    }
+
+    .card-header {
+      background-color: black;
+      color: white;
+      text-align: center;
+    }
+
+    .card-body {
+      text-align: center;
+      color: white;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    img {      
+      height: 200px;
+      width: 200px;
+      margin-bottom: 10px;
+    }
+
+    .search {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 30px;
+    }
+
+    #brand {
+      width: 250px;
+      border-radius: 4px;
+    }
+
+    button {
+      margin-left: 20px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+
+<body>
+  <!--Html code-->
+  <h1 style="text-align: center;font-style: italic;color:#9A1663;">Eyeliner collections</h1>
+  <h6 style="text-align: center;font-style: italic;font-weight:300;">Select your brand from the below list</h6>
+  
+  <!--script.js-->
+  <script>
+    //create a dropdownlist using async await
+    async function call() { 
+    //create div element
+    var search = document.createElement("div");
+    search.setAttribute("class","search");    
+    document.body.append(search);
+    //create dropdownlist  && fetch the particular brand       
+    var res = await fetch(`https://makeup-api.herokuapp.com/api/v1/products.json?product_type=eyeliner`);
+    var res1 = await res.json();
+    
+    var select = document.createElement("select");
+    select.setAttribute("id", "brand");
+
+    //remove duplicates from the list
+    let res0 = res1.map((ele) => ele.brand);
+    let res2 = res0.filter((a, b) => res0.indexOf(a) === b)
+    //create options of brand names dynamically from filtered array
+    for (var i = 0; i < res2.length; i++) {
+        if (res2[i] != undefined) {
+            select.innerHTML += `<option value="${res2[i]}">${res2[i]}</option>`
+            search.append(select)
+        };
+
+    }
+    //create button
+    var button = document.createElement("button");
+    button.setAttribute("type","button");
+    button.setAttribute("onclick","products()");
+    button.innerHTML="Search";
+    search.append(button);
+
+}
+call();
+//fetch data from the selected brand and showing selected brand products
+  async function products() {
+    let brandname = document.querySelector("#brand").value;
+    var res = await fetch(`https://makeup-api.herokuapp.com/api/v1/products.json?product_type=eyeliner&brand=${brandname}`);
+    var data1 = await res.json();
+    //create a container,row      
+    var container = document.createElement("div");
+    container.setAttribute("class", "container");
+    var row = document.createElement("div");
+    row.setAttribute("class", "row");
+    container.append(row);
+    //create columns using for loop
+    for (var i = 0; i < data1.length; i++) {
+      row.innerHTML += `<div class="col md-4" >
+      <div class="card-header"><b> Brand : ${data1[i].brand}</b></div>
+      <div class="card-body">
+      <img src="${data1[i].image_link}">
+      <h6 class="card-title">Name : ${data1[i].name}</h6>
+      <h6 class="card-title">Price : $${data1[i].price}</h6>
+      <h6 class="card-title">Description : ${data1[i].description}</h6>        
+      <p>product url : ${data1[i].product_link}</p>
+      </div>
+    </div>`
+    }
+
+    document.body.append(container);
+
+  }
+</script> 
+
+</body>
+
+</html>
